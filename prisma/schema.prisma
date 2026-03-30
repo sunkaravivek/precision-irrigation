@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String       @id @default(cuid())
+  name        String
+  email       String       @unique
+  password    String
+  createdAt   DateTime     @default(now())
+  farms       Farm[]
+  simulations Simulation[]
+}
+
+model Farm {
+  id               String       @id @default(cuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  location         String
+  area             Float
+  cropType         String
+  soilType         String
+  irrigationMethod String
+  createdAt        DateTime     @default(now())
+  simulations      Simulation[]
+}
+
+model Simulation {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farmId             String
+  farm               Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  cropType           String
+  cropStage          String
+  soilType           String
+  soilMoisture       Float
+  temperature        Float
+  humidity           Float
+  rainfall           Float
+  evapotranspiration Float
+  rainForecast       Boolean
+  currentState       String
+  nextState          String
+  irrigationRequired Boolean
+  recommendedWater   Float
+  efficiencyScore    Float
+  riskLevel          String
+  explanation        String
+  createdAt          DateTime @default(now())
+}
+
+model CropDataset {
+  id               String @id @default(cuid())
+  crop             String
+  growthStage      String
+  kcValue          Float
+  rootDepth        Float
+  waterRequirement Float
+}
+
+model SoilDataset {
+  id               String @id @default(cuid())
+  soilType         String
+  fieldCapacity    Float
+  wiltingPoint     Float
+  infiltrationRate Float
+}
+
+model WeatherDataset {
+  id                 String   @id @default(cuid())
+  date               DateTime
+  temperature        Float
+  humidity           Float
+  rainfall           Float
+  evapotranspiration Float
+}
+
+model IrrigationDataset {
+  id                 String @id @default(cuid())
+  irrigationMethod   String
+  waterApplied       Float
+  irrigationInterval Int
+  moistureThreshold  Float
+}
